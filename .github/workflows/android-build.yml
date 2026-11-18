@@ -37,8 +37,9 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: 🤖 Set up Android SDK & Build Tools
-        uses: android-actions/setup-android@v3
+      - name: 📝 Accept Android SDK Licenses
+        run: |
+          yes | sdkmanager --licenses || true
 
       - name: 📦 Install dependencies
         run: npm ci
@@ -56,8 +57,8 @@ jobs:
         run: chmod +x android/gradlew
 
       - name: 🔨 Compile Android APK with Gradle
+        working-directory: android
         run: |
-          cd android
           if [ "${{ github.event.inputs.build_variant }}" = "release" ] && [ -n "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" ]; then
             echo "Building signed Release APK..."
             ./gradlew assembleRelease --no-daemon --stacktrace
