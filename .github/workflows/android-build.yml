@@ -16,6 +16,9 @@ on:
           - debug
           - release
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build & Package Android APK
@@ -89,6 +92,27 @@ jobs:
           name: Barbie-Period-Tracker-Android-APK
           path: build-output/Barbie-Period-Tracker.apk
           retention-days: 30
+
+      - name: 🚀 Publish Direct APK to GitHub Releases
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.0
+          name: "Barbie Period Tracker v1.0.0 (Direct APK)"
+          body: |
+            ### 🎀 Barbie Period Tracker - Android APK Direct Download
+
+            Click the **`Barbie-Period-Tracker.apk`** file below under **Assets** to download the standalone APK directly to your phone (no unzipping required!).
+
+            - **Filename**: `Barbie-Period-Tracker.apk`
+            - **Package**: `com.barbie.periodtracker`
+            - **Platform**: Android
+            - **License**: 100% Free Forever
+          files: build-output/Barbie-Period-Tracker.apk
+          prerelease: false
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 📋 Capture Build Logs on Failure
         if: failure()
