@@ -15,6 +15,7 @@ import { PinkCard } from '../../components/common/PinkCard';
 import { PinkButton } from '../../components/common/PinkButton';
 import { CircularPhaseIndicator } from '../../components/common/CircularPhaseIndicator';
 import { AnimatedHearts } from '../../components/common/AnimatedHearts';
+import { AppLogo } from '../../components/common/AppLogo';
 import { getDatabase } from '../../db/sqlite';
 import {
   CycleRecord,
@@ -190,13 +191,16 @@ export default function HomeScreen() {
       >
         {/* Top Header */}
         <View style={styles.header}>
-          <View>
-            <Text style={[styles.subGreeting, { color: colors.textMuted }]}>
-              {format(new Date(), 'EEEE, MMMM d')}
-            </Text>
-            <Text style={[styles.mainGreeting, { color: colors.text }]}>
-              Good day, Princess! 👑
-            </Text>
+          <View style={styles.headerLeft}>
+            <AppLogo size={46} showGlow={false} />
+            <View>
+              <Text style={[styles.subGreeting, { color: colors.textMuted }]}>
+                {format(new Date(), 'EEEE, MMMM d')}
+              </Text>
+              <Text style={[styles.mainGreeting, { color: colors.text }]}>
+                Good day, Princess! 👑
+              </Text>
+            </View>
           </View>
           <TouchableOpacity
             style={[styles.careBadge, { backgroundColor: colors.highlight, borderColor: colors.border }]}
@@ -440,6 +444,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   subGreeting: {
     fontSize: 13,

@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ThemeProvider, useAppTheme } from '../context/ThemeContext';
 import { WelcomeModal } from '../components/common/WelcomeModal';
+import { DreamlandLoadingScreen } from '../components/common/DreamlandLoadingScreen';
 import { getDatabase } from '../db/sqlite';
 
-// Keep splash screen visible while loading resources
+// Keep native splash screen visible until our React Native tree mounts
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 function RootNavigation() {
@@ -43,30 +44,40 @@ function RootNavigation() {
 }
 
 export default function RootLayout() {
-  const [isReady, setIsReady] = useState(false);
+  const [isDbReady, setIsDbReady] = useState(false);
+  const [isOverlayGone, setIsOverlayGone] = useState(false);
+  const [dbError, setDbError] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function prepare() {
-      try {
-        await getDatabase();
-      } catch (e) {
-        console.warn('DB initialization error:', e);
-      } finally {
-        setIsReady(true);
-        await SplashScreen.hideAsync().catch(() => {});
-      }
+  const initApp = useCallback(async () => {
+    setDbError(null);
+    try {
+      await getDatabase();
+      setIsDbReady(true);
+    } catch (e: any) {
+      console.warn('DB initialization error:', e);
+      setDbError(e?.message || 'Database error');
+    } finally {
+      // Hide native splash immediately so the Dreamland animation takes over smoothly
+      await SplashScreen.hideAsync().catch(() => {});
     }
-    prepare();
   }, []);
 
-  if (!isReady) {
-    return null;
-  }
+  useEffect(() => {
+    initApp();
+  }, [initApp]);
 
   return (
     <SafeAreaProvider>
       <ThemeProvider>
         <RootNavigation />
+        {!isOverlayGone && (
+          <DreamlandLoadingScreen
+            isReady={isDbReady}
+            error={dbError}
+            onRetry={initApp}
+            onAnimationComplete={() => setIsOverlayGone(true)}
+          />
+        )}
       </ThemeProvider>
     </SafeAreaProvider>
   );

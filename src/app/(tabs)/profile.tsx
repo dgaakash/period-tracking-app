@@ -13,6 +13,7 @@ import { router } from 'expo-router';
 import { useAppTheme } from '../../context/ThemeContext';
 import { PinkCard } from '../../components/common/PinkCard';
 import { PinkButton } from '../../components/common/PinkButton';
+import { AppLogo } from '../../components/common/AppLogo';
 import { THEMES, ThemeName } from '../../constants/theme';
 import { getDatabase } from '../../db/sqlite';
 import { deleteAllUserData } from '../../services/dataExport';
@@ -134,9 +135,7 @@ export default function ProfileScreen() {
       >
         {/* Profile Card */}
         <PinkCard style={styles.profileCard}>
-          <View style={[styles.avatarBox, { backgroundColor: colors.highlight }]}>
-            <Crown size={36} color={colors.primary} />
-          </View>
+          <AppLogo size={80} showGlow style={{ marginBottom: 12 }} />
           <Text style={[styles.profileName, { color: colors.text }]}>
             Princess 👑
           </Text>
