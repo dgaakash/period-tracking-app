@@ -51,7 +51,9 @@ export default function RootLayout() {
   const initApp = useCallback(async () => {
     setDbError(null);
     try {
-      await getDatabase();
+      // Ensure smooth presentation of the Dreamland loading animation on initial launch
+      const minDisplayPromise = new Promise((resolve) => setTimeout(resolve, 1100));
+      await Promise.all([getDatabase(), minDisplayPromise]);
       setIsDbReady(true);
     } catch (e: any) {
       console.warn('DB initialization error:', e);
