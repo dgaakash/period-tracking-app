@@ -296,7 +296,12 @@ export default function HomeScreen() {
             activeOpacity={0.85}
             onPress={() => router.push('/features/love-messages')}
           >
-            <PinkCard style={[styles.loveNoteCard, { backgroundColor: colors.surface }]}>
+            <PinkCard
+              style={[
+                styles.loveNoteCard,
+                { backgroundColor: colors.surface, borderLeftColor: colors.primary },
+              ]}
+            >
               <View style={styles.loveNoteHeader}>
                 <MessageCircleHeart size={20} color={colors.primary} />
                 <Text style={[styles.loveNoteTitle, { color: colors.primary }]}>
@@ -326,7 +331,10 @@ export default function HomeScreen() {
           <PinkCard style={styles.wellnessCard}>
             <View style={styles.wellnessCardHeader}>
               <Droplet size={20} color="#4FC3F7" />
-              <TouchableOpacity onPress={handleAddWater} style={styles.addMiniBtn}>
+              <TouchableOpacity
+                onPress={handleAddWater}
+                style={[styles.addMiniBtn, { backgroundColor: colors.highlight }]}
+              >
                 <Plus size={16} color={colors.primary} />
               </TouchableOpacity>
             </View>
@@ -559,7 +567,6 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 16,
     borderLeftWidth: 4,
-    borderLeftColor: '#FF4FA3',
   },
   loveNoteHeader: {
     flexDirection: 'row',
@@ -616,7 +623,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#FFF0F6',
     alignItems: 'center',
     justifyContent: 'center',
   },

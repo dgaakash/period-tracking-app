@@ -392,6 +392,7 @@ export default function TrackScreen() {
                   onPress={() => setEnergyLevel(num)}
                   style={[
                     styles.scaleBtn,
+                    { backgroundColor: colors.highlight },
                     energyLevel === num && { backgroundColor: colors.primary },
                   ]}
                 >
@@ -410,7 +411,7 @@ export default function TrackScreen() {
 
           <View style={[styles.metricRow, { marginTop: 14 }]}>
             <Text style={[styles.sliderLabel, { color: colors.text }]}>
-              Stress Level: <Text style={{ color: '#E57373', fontWeight: '800' }}>{stressLevel}/10</Text>
+              Stress Level: <Text style={{ color: colors.error, fontWeight: '800' }}>{stressLevel}/10</Text>
             </Text>
             <View style={styles.scaleButtons}>
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((num) => (
@@ -419,7 +420,8 @@ export default function TrackScreen() {
                   onPress={() => setStressLevel(num)}
                   style={[
                     styles.scaleBtn,
-                    stressLevel === num && { backgroundColor: '#E57373' },
+                    { backgroundColor: colors.highlight },
+                    stressLevel === num && { backgroundColor: colors.error },
                   ]}
                 >
                   <Text
@@ -630,7 +632,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#F5F5F5',
   },
   scaleBtnText: {
     fontSize: 11,

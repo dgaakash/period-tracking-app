@@ -19,9 +19,10 @@ export const PinkCard: React.FC<PinkCardProps> = ({ children, style, variant = '
         {
           backgroundColor: variant === 'glass' ? colors.surfaceGlass : colors.surface,
           borderColor: colors.cardBorder,
-          shadowColor: colors.primary,
+          shadowColor: colors.shadow || colors.primary,
         },
         variant === 'outlined' && { borderWidth: 1.5, elevation: 0, shadowOpacity: 0 },
+        colors.isDark && styles.darkShadow,
         style,
       ]}
     >
@@ -36,8 +37,13 @@ const styles = StyleSheet.create({
     padding: themeDimensions.spacing.md,
     borderWidth: 1,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowOpacity: 0.1,
+    shadowRadius: 14,
     elevation: 3,
+  },
+  darkShadow: {
+    shadowOpacity: 0.35,
+    shadowRadius: 18,
+    elevation: 5,
   },
 });

@@ -144,7 +144,7 @@ export default function InsightsScreen() {
         </Text>
 
         {/* Date Filter Pills */}
-        <View style={styles.filterRow}>
+        <View style={[styles.filterRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {(['1M', '3M', '6M', '12M', 'ALL'] as FilterRange[]).map((f) => (
             <TouchableOpacity
               key={f}
@@ -317,7 +317,7 @@ export default function InsightsScreen() {
               {Object.entries(moodCounts).map(([mood, count]) => (
                 <View key={mood} style={styles.moodRow}>
                   <Text style={[styles.moodName, { color: colors.text }]}>{mood}</Text>
-                  <View style={styles.moodBarTrack}>
+                  <View style={[styles.moodBarTrack, { backgroundColor: colors.highlight }]}>
                     <View
                       style={[
                         styles.moodBarFill,
@@ -404,11 +404,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 16,
-    backgroundColor: '#FFFFFF',
     borderRadius: 20,
     padding: 4,
     borderWidth: 1,
-    borderColor: '#FFE0ED',
   },
   filterBtn: {
     paddingVertical: 6,
@@ -490,7 +488,6 @@ const styles = StyleSheet.create({
   moodBarTrack: {
     flex: 1,
     height: 10,
-    backgroundColor: '#FFE4EE',
     borderRadius: 5,
     overflow: 'hidden',
   },

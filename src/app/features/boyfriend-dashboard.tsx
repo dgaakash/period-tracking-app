@@ -306,8 +306,8 @@ export default function BoyfriendDashboardScreen() {
           <View style={styles.lockContent}>
             <View style={[styles.lockIconCircle, { backgroundColor: `${colors.primary}18` }]}>
               <Lock size={36} color={colors.primary} />
-              <View style={styles.lockHeartMiniBadge}>
-                <Heart size={14} color="#FFFFFF" fill="#FF4FA3" />
+              <View style={[styles.lockHeartMiniBadge, { backgroundColor: colors.primary }]}>
+                <Heart size={14} color="#FFFFFF" fill="#FFFFFF" />
               </View>
             </View>
 
@@ -487,7 +487,7 @@ export default function BoyfriendDashboardScreen() {
           </Text>
 
           {/* Today's Logged Mood & Symptoms */}
-          <View style={styles.sharedInfoRow}>
+          <View style={[styles.sharedInfoRow, { borderTopColor: colors.border }]}>
             <View style={styles.sharedBadge}>
               <Text style={[styles.sharedBadgeLabel, { color: colors.textMuted }]}>Today's Mood:</Text>
               <Text style={[styles.sharedBadgeVal, { color: colors.text }]}>
@@ -630,7 +630,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#FFE0ED',
     gap: 8,
   },
   sharedBadge: {
@@ -719,7 +718,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: -2,
     right: -2,
-    backgroundColor: '#FF4FA3',
     width: 26,
     height: 26,
     borderRadius: 13,
@@ -779,7 +777,6 @@ const styles = StyleSheet.create({
     borderRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#FF4FA3',
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.1,
     shadowRadius: 8,

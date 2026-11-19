@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { Image } from 'expo-image';
+import { useAppTheme } from '../../context/ThemeContext';
 
 interface AppLogoProps {
   size?: number;
@@ -13,12 +14,17 @@ export const AppLogo: React.FC<AppLogoProps> = ({
   style,
   showGlow = true,
 }) => {
+  const { colors } = useAppTheme();
+
   return (
     <View
       style={[
         { width: size, height: size },
         styles.container,
-        showGlow && styles.glowContainer,
+        showGlow && [
+          styles.glowContainer,
+          { shadowColor: colors.shadow || colors.primary },
+        ],
         style,
       ]}
     >
@@ -30,6 +36,8 @@ export const AppLogo: React.FC<AppLogoProps> = ({
               width: size * 0.9,
               height: size * 0.9,
               borderRadius: (size * 0.9) / 2,
+              backgroundColor: colors.primary,
+              opacity: colors.isDark ? 0.35 : 0.2,
             },
           ]}
         />
@@ -52,7 +60,6 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   glowContainer: {
-    shadowColor: '#FF4FA3',
     shadowOffset: { width: 0, height: 6 },
     shadowOpacity: 0.35,
     shadowRadius: 14,
@@ -60,7 +67,5 @@ const styles = StyleSheet.create({
   },
   glowAura: {
     position: 'absolute',
-    backgroundColor: '#FF4FA3',
-    opacity: 0.18,
   },
 });

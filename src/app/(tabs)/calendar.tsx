@@ -336,7 +336,11 @@ export default function CalendarScreen() {
               {format(currentMonth, 'MMMM yyyy')}
             </Text>
             {!isViewingCurrentMonth && (
-              <TouchableOpacity onPress={jumpToToday} style={styles.todayPill} activeOpacity={0.75}>
+              <TouchableOpacity
+                onPress={jumpToToday}
+                style={[styles.todayPill, { backgroundColor: colors.highlight }]}
+                activeOpacity={0.75}
+              >
                 <Sparkles size={11} color={colors.primary} />
                 <Text style={[styles.todayPillText, { color: colors.primary }]}>Today</Text>
               </TouchableOpacity>
@@ -344,10 +348,24 @@ export default function CalendarScreen() {
           </View>
 
           <View style={styles.navControls}>
-            <TouchableOpacity onPress={prevMonth} style={styles.monthNavBtn} activeOpacity={0.7}>
+            <TouchableOpacity
+              onPress={prevMonth}
+              style={[
+                styles.monthNavBtn,
+                { backgroundColor: colors.surfaceGlass, borderColor: colors.cardBorder },
+              ]}
+              activeOpacity={0.7}
+            >
               <ChevronLeft size={22} color={colors.primary} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={nextMonth} style={styles.monthNavBtn} activeOpacity={0.7}>
+            <TouchableOpacity
+              onPress={nextMonth}
+              style={[
+                styles.monthNavBtn,
+                { backgroundColor: colors.surfaceGlass, borderColor: colors.cardBorder },
+              ]}
+              activeOpacity={0.7}
+            >
               <ChevronRight size={22} color={colors.primary} />
             </TouchableOpacity>
           </View>
@@ -721,7 +739,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255, 79, 163, 0.12)',
     paddingVertical: 3,
     paddingHorizontal: 8,
     borderRadius: 12,
@@ -741,9 +758,7 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
     borderWidth: 1,
-    borderColor: 'rgba(255, 79, 163, 0.15)',
   },
   calendarCard: {
     padding: 14,

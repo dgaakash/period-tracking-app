@@ -64,14 +64,18 @@ export const PinkButton: React.FC<PinkButtonProps> = ({
   const gradientColors: [string, string] =
     variant === 'secondary'
       ? [colors.secondary, colors.highlight]
-      : [colors.primary, colors.secondary];
+      : (colors.gradient || [colors.primary, colors.secondary]);
 
   return (
     <TouchableOpacity
       onPress={handlePress}
       disabled={disabled || loading}
       activeOpacity={0.85}
-      style={[styles.container, style]}
+      style={[
+        styles.container,
+        { shadowColor: colors.shadow || colors.primary },
+        style,
+      ]}
     >
       <LinearGradient
         colors={gradientColors}
@@ -95,10 +99,9 @@ export const PinkButton: React.FC<PinkButtonProps> = ({
 const styles = StyleSheet.create({
   container: {
     borderRadius: themeDimensions.radius.full,
-    shadowColor: '#FF4FA3',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.22,
-    shadowRadius: 8,
+    shadowOpacity: 0.26,
+    shadowRadius: 12,
     elevation: 4,
   },
   button: {
@@ -115,8 +118,8 @@ const styles = StyleSheet.create({
   },
   text: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '700',
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
 });

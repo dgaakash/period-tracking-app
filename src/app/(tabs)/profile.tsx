@@ -193,6 +193,14 @@ export default function ProfileScreen() {
                 Color Theme
               </Text>
             </View>
+            <TouchableOpacity
+              onPress={() => router.push('/features/theme-customization')}
+              activeOpacity={0.7}
+            >
+              <Text style={{ fontSize: 12, fontWeight: '700', color: colors.primary }}>
+                Theme Studio 🎨 →
+              </Text>
+            </TouchableOpacity>
           </View>
 
           <View style={styles.themeGrid}>
@@ -210,8 +218,11 @@ export default function ProfileScreen() {
                   }}
                   style={[
                     styles.themeItem,
-                    { borderColor: t.colors.primary },
-                    isSelected && { borderWidth: 2.5, transform: [{ scale: 1.02 }] },
+                    {
+                      backgroundColor: colors.highlight,
+                      borderColor: isSelected ? t.colors.primary : colors.border,
+                    },
+                    isSelected && { borderWidth: 2, transform: [{ scale: 1.02 }] },
                   ]}
                 >
                   <View style={[styles.themeSwatch, { backgroundColor: t.colors.primary }]} />
@@ -223,7 +234,7 @@ export default function ProfileScreen() {
                       isSelected && { fontWeight: '800', color: colors.primary },
                     ]}
                   >
-                    {t.name}
+                    {t.name.split(' (')[0]}
                   </Text>
                 </TouchableOpacity>
               );
@@ -245,7 +256,7 @@ export default function ProfileScreen() {
             <Switch
               value={greetingEnabled}
               onValueChange={handleToggleGreeting}
-              trackColor={{ false: '#FFE0ED', true: colors.primary }}
+              trackColor={{ false: colors.border, true: colors.primary }}
             />
           </View>
 
@@ -261,7 +272,7 @@ export default function ProfileScreen() {
             <Switch
               value={biometricEnabled}
               onValueChange={handleToggleBiometrics}
-              trackColor={{ false: '#FFE0ED', true: colors.primary }}
+              trackColor={{ false: colors.border, true: colors.primary }}
             />
           </View>
         </PinkCard>
@@ -411,7 +422,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     borderWidth: 1,
     gap: 8,
-    backgroundColor: '#FFFFFF',
   },
   themeSwatch: {
     width: 20,
