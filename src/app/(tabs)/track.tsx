@@ -203,9 +203,12 @@ export default function TrackScreen() {
       if (selectedMood) {
         await db.runAsync(
           `INSERT INTO mood_entries (id, user_id, date, mood_type, intensity)
-           VALUES (?, ?, ?, ?, 5)`,
+           VALUES (?, ?, ?, ?, 5)
+           ON CONFLICT(id) DO UPDATE SET mood_type = excluded.mood_type, intensity = excluded.intensity`,
           [`mood_${todayStr}`, defaultUserId, todayStr, selectedMood]
         );
+      } else {
+        await db.runAsync('DELETE FROM mood_entries WHERE date = ?', [todayStr]);
       }
 
       // 3. Save period flow
@@ -226,17 +229,19 @@ export default function TrackScreen() {
         const symId = `sym_${todayStr}_${symName}`;
         await db.runAsync(
           `INSERT INTO symptoms (id, user_id, date, category, symptom_name, severity)
-           VALUES (?, ?, ?, 'physical', ?, ?)`,
+           VALUES (?, ?, ?, 'physical', ?, ?)
+           ON CONFLICT(id) DO UPDATE SET severity = excluded.severity`,
           [symId, defaultUserId, todayStr, symName, severity]
         );
       }
 
       // 5. Save medication
+      await db.runAsync('DELETE FROM medication_logs WHERE date = ?', [todayStr]);
       if (medication.trim()) {
         await db.runAsync(
           `INSERT INTO medication_logs (id, user_id, date, medication_name)
            VALUES (?, ?, ?, ?)`,
-          [`med_${Date.now()}`, defaultUserId, todayStr, medication.trim()]
+          [`med_${todayStr}`, defaultUserId, todayStr, medication.trim()]
         );
       }
 

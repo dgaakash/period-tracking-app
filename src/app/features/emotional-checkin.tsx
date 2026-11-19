@@ -80,7 +80,7 @@ export default function EmotionalCheckinScreen() {
       await db.runAsync(
         `INSERT INTO mood_entries (id, user_id, date, mood_type, intensity, notes)
          VALUES (?, ?, ?, ?, ?, ?)
-         ON CONFLICT(id) DO UPDATE SET mood_type = excluded.mood_type, notes = excluded.notes`,
+         ON CONFLICT(id) DO UPDATE SET mood_type = excluded.mood_type, intensity = excluded.intensity, notes = excluded.notes`,
         [moodPayload.id, moodPayload.user_id, moodPayload.date, moodPayload.mood_type, moodPayload.intensity, moodPayload.notes]
       );
       await queueOperation('mood_entries', moodPayload.id, 'INSERT', moodPayload);
