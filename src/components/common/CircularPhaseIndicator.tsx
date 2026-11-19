@@ -79,8 +79,8 @@ export const CircularPhaseIndicator: React.FC<CircularPhaseIndicatorProps> = ({
           {daysUntilPeriod > 0
             ? `Period in ${daysUntilPeriod} ${daysUntilPeriod === 1 ? 'day' : 'days'}`
             : daysUntilPeriod === 0
-            ? 'Period expected today'
-            : `Day ${Math.abs(daysUntilPeriod)} of cycle`}
+            ? 'Period expected today 💗'
+            : `${Math.abs(daysUntilPeriod)} ${Math.abs(daysUntilPeriod) === 1 ? 'day' : 'days'} overdue 🌸`}
         </Text>
       </View>
     </View>
