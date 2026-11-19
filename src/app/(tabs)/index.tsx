@@ -16,6 +16,7 @@ import { PinkButton } from '../../components/common/PinkButton';
 import { CircularPhaseIndicator } from '../../components/common/CircularPhaseIndicator';
 import { AnimatedHearts } from '../../components/common/AnimatedHearts';
 import { AppLogo } from '../../components/common/AppLogo';
+import { FlowSelectionModal } from '../../components/common/FlowSelectionModal';
 import { getDatabase } from '../../db/sqlite';
 import {
   CycleRecord,
@@ -54,6 +55,8 @@ export default function HomeScreen() {
   const [todaySleep, setTodaySleep] = useState<number | null>(null);
   const [latestLoveMessage, setLatestLoveMessage] = useState<string | null>(null);
   const [isPeriodActive, setIsPeriodActive] = useState(false);
+  const [todayPeriodFlow, setTodayPeriodFlow] = useState<string | null>(null);
+  const [showFlowModal, setShowFlowModal] = useState(false);
 
   const todayStr = format(new Date(), 'yyyy-MM-dd');
 
@@ -72,12 +75,13 @@ export default function HomeScreen() {
       }));
       setCycles(mappedCycles);
 
-      // Check if period is active today
-      const todayPeriod = await db.getFirstAsync<{ id: string }>(
-        'SELECT id FROM period_days WHERE date = ?',
+      // Check if period is active today & its flow
+      const todayPeriod = await db.getFirstAsync<{ id: string; flow?: string }>(
+        'SELECT id, flow FROM period_days WHERE date = ?',
         [todayStr]
       );
       setIsPeriodActive(Boolean(todayPeriod));
+      setTodayPeriodFlow(todayPeriod?.flow || null);
 
       // Load today's daily log
       const log = await db.getFirstAsync<any>(
@@ -140,37 +144,51 @@ export default function HomeScreen() {
     }
   };
 
-  const handleTogglePeriodToday = async () => {
+  const handleOpenFlowModal = () => {
     try {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      const db = await getDatabase();
-      if (isPeriodActive) {
-        await db.runAsync('DELETE FROM period_days WHERE date = ?', [todayStr]);
-        setIsPeriodActive(false);
-      } else {
-        await db.runAsync(
-          `INSERT INTO period_days (id, user_id, date, flow)
-           VALUES (?, 'local-princess-user', ?, 'medium')
-           ON CONFLICT(user_id, date) DO NOTHING`,
-          [`p_${todayStr}`, todayStr]
-        );
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    } catch {}
+    setShowFlowModal(true);
+  };
 
-        // Also add or update cycle start if needed
-        const currentCycle = await db.getFirstAsync<any>(
-          'SELECT * FROM menstrual_cycles ORDER BY start_date DESC LIMIT 1'
+  const handleSavePeriodFlow = async (flow: string) => {
+    try {
+      const db = await getDatabase();
+      await db.runAsync(
+        `INSERT INTO period_days (id, user_id, date, flow)
+         VALUES (?, 'local-princess-user', ?, ?)
+         ON CONFLICT(user_id, date) DO UPDATE SET flow = excluded.flow`,
+        [`p_${todayStr}`, todayStr, flow]
+      );
+
+      // Also add or update cycle start if needed
+      const currentCycle = await db.getFirstAsync<any>(
+        'SELECT * FROM menstrual_cycles ORDER BY start_date DESC LIMIT 1'
+      );
+      if (!currentCycle || currentCycle.end_date) {
+        await db.runAsync(
+          `INSERT INTO menstrual_cycles (id, user_id, start_date, period_length)
+           VALUES (?, 'local-princess-user', ?, 5)`,
+          [`cycle_${Date.now()}`, todayStr]
         );
-        if (!currentCycle || currentCycle.end_date) {
-          await db.runAsync(
-            `INSERT INTO menstrual_cycles (id, user_id, start_date, period_length)
-             VALUES (?, 'local-princess-user', ?, 5)`,
-            [`cycle_${Date.now()}`, todayStr]
-          );
-        }
-        setIsPeriodActive(true);
       }
-      loadData();
+      setIsPeriodActive(true);
+      setTodayPeriodFlow(flow);
+      await loadData();
     } catch (err) {
-      console.warn('Error toggling period:', err);
+      console.warn('Error saving period flow:', err);
+    }
+  };
+
+  const handleRemovePeriodToday = async () => {
+    try {
+      const db = await getDatabase();
+      await db.runAsync('DELETE FROM period_days WHERE date = ?', [todayStr]);
+      setIsPeriodActive(false);
+      setTodayPeriodFlow(null);
+      await loadData();
+    } catch (err) {
+      console.warn('Error removing period today:', err);
     }
   };
 
@@ -232,8 +250,14 @@ export default function HomeScreen() {
 
           {/* Quick Period Action Button */}
           <PinkButton
-            title={isPeriodActive ? 'Period Logged Today ✓' : '+ Log Period Today 💗'}
-            onPress={handleTogglePeriodToday}
+            title={
+              isPeriodActive
+                ? (todayPeriodFlow
+                    ? `Period Logged (${todayPeriodFlow.charAt(0).toUpperCase() + todayPeriodFlow.slice(1)}) ✓`
+                    : 'Period Logged Today ✓')
+                : '+ Log Period Today 💗'
+            }
+            onPress={handleOpenFlowModal}
             variant={isPeriodActive ? 'secondary' : 'primary'}
             style={{ marginTop: 14 }}
           />
@@ -428,6 +452,17 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      {/* Menstrual Flow Selection Dialog */}
+      <FlowSelectionModal
+        visible={showFlowModal}
+        date={new Date()}
+        initialFlow={todayPeriodFlow}
+        isAlreadyLogged={isPeriodActive}
+        onSelectFlow={handleSavePeriodFlow}
+        onRemovePeriod={handleRemovePeriodToday}
+        onClose={() => setShowFlowModal(false)}
+      />
     </View>
   );
 }

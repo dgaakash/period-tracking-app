@@ -12,6 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAppTheme } from '../../context/ThemeContext';
 import { PinkCard } from '../../components/common/PinkCard';
 import { PinkButton } from '../../components/common/PinkButton';
+import { FlowSelectionModal } from '../../components/common/FlowSelectionModal';
 import { getDatabase } from '../../db/sqlite';
 import {
   CycleRecord,
@@ -53,6 +54,7 @@ export default function CalendarScreen() {
     water?: number;
     notes?: string;
   }>({});
+  const [showFlowModal, setShowFlowModal] = useState(false);
 
   const loadData = useCallback(async () => {
     try {
@@ -133,25 +135,30 @@ export default function CalendarScreen() {
     setSelectedDate(day);
   };
 
-  const togglePeriodForSelectedDate = async () => {
+  const handleSavePeriodFlow = async (flow: string) => {
     try {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       const dateStr = format(selectedDate, 'yyyy-MM-dd');
       const db = await getDatabase();
-
-      if (loggedPeriodDays.includes(dateStr)) {
-        await db.runAsync('DELETE FROM period_days WHERE date = ?', [dateStr]);
-      } else {
-        await db.runAsync(
-          `INSERT INTO period_days (id, user_id, date, flow)
-           VALUES (?, 'local-princess-user', ?, 'medium')
-           ON CONFLICT(user_id, date) DO NOTHING`,
-          [`p_${dateStr}`, dateStr]
-        );
-      }
-      loadData();
+      await db.runAsync(
+        `INSERT INTO period_days (id, user_id, date, flow)
+         VALUES (?, 'local-princess-user', ?, ?)
+         ON CONFLICT(user_id, date) DO UPDATE SET flow = excluded.flow`,
+        [`p_${dateStr}`, dateStr, flow]
+      );
+      await loadData();
     } catch (err) {
-      console.warn('Error toggling period date:', err);
+      console.warn('Error saving period flow for calendar date:', err);
+    }
+  };
+
+  const handleRemovePeriod = async () => {
+    try {
+      const dateStr = format(selectedDate, 'yyyy-MM-dd');
+      const db = await getDatabase();
+      await db.runAsync('DELETE FROM period_days WHERE date = ?', [dateStr]);
+      await loadData();
+    } catch (err) {
+      console.warn('Error removing period date:', err);
     }
   };
 
@@ -307,12 +314,27 @@ export default function CalendarScreen() {
                 {format(selectedDate, 'EEEE, MMMM d, yyyy')}
               </Text>
               <Text style={[styles.detailsSub, { color: colors.primary }]}>
-                {isSelectedPeriod ? 'Period bleeding logged' : 'No period bleeding logged'}
+                {isSelectedPeriod
+                  ? (selectedDateDetails.periodFlow
+                      ? `Period logged (${selectedDateDetails.periodFlow.charAt(0).toUpperCase() + selectedDateDetails.periodFlow.slice(1)})`
+                      : 'Period bleeding logged')
+                  : 'No period bleeding logged'}
               </Text>
             </View>
             <PinkButton
-              title={isSelectedPeriod ? 'Remove Period' : '+ Log Period'}
-              onPress={togglePeriodForSelectedDate}
+              title={
+                isSelectedPeriod
+                  ? (selectedDateDetails.periodFlow
+                      ? `${selectedDateDetails.periodFlow.charAt(0).toUpperCase() + selectedDateDetails.periodFlow.slice(1)} ✏️`
+                      : 'Logged ✓')
+                  : '+ Log Period'
+              }
+              onPress={() => {
+                try {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                } catch {}
+                setShowFlowModal(true);
+              }}
               variant={isSelectedPeriod ? 'outline' : 'primary'}
               style={{ paddingVertical: 8, paddingHorizontal: 14 }}
               textStyle={{ fontSize: 13 }}
@@ -321,6 +343,14 @@ export default function CalendarScreen() {
 
           {/* Logged details summary */}
           <View style={styles.detailsList}>
+            {selectedDateDetails.periodFlow && (
+              <View style={styles.detailRow}>
+                <Text style={[styles.detailKey, { color: colors.textMuted }]}>Flow Intensity:</Text>
+                <Text style={[styles.detailVal, { color: colors.primary, fontWeight: '700' }]}>
+                  {selectedDateDetails.periodFlow.charAt(0).toUpperCase() + selectedDateDetails.periodFlow.slice(1)}
+                </Text>
+              </View>
+            )}
             {selectedDateDetails.mood && (
               <View style={styles.detailRow}>
                 <Text style={[styles.detailKey, { color: colors.textMuted }]}>Mood:</Text>
@@ -368,6 +398,17 @@ export default function CalendarScreen() {
           {MEDICAL_DISCLAIMER}
         </Text>
       </ScrollView>
+
+      {/* Menstrual Flow Selection Dialog */}
+      <FlowSelectionModal
+        visible={showFlowModal}
+        date={selectedDate}
+        initialFlow={selectedDateDetails.periodFlow}
+        isAlreadyLogged={Boolean(selectedDateDetails.periodFlow)}
+        onSelectFlow={handleSavePeriodFlow}
+        onRemovePeriod={handleRemovePeriod}
+        onClose={() => setShowFlowModal(false)}
+      />
     </View>
   );
 }
